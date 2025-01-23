@@ -1,0 +1,92 @@
+{% extends "layouts/main.html" %}
+{% load helpers %}
+
+{% block content %}
+    <div class="page-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card shadow-2">
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table mb-0" id="datatable">
+                                    <thead>
+                                    <tr>
+                                        <th>FIO</th>
+                                        <th>Telefon</th>
+                                        <th>Jinsi</th>
+                                        <th>Tug'ulgan kuni</th>
+                                        <th>#</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for student in students %}
+                                        <tr>
+                                            <th scope="row"><a
+                                                    class="a-href"
+                                                    href="{% url "accounts:student" pk=student.id %}">{{ student.first_name }} {{ student.last_name }}</a>
+                                            </th>
+                                            <td>{{ student.phone }}</td>
+                                            <td>{{ student.gender }}</td>
+                                            <td>{{ student.birth_day }}</td>
+                                            <td>
+                                                {% if group.course.id|isUserCertificate:student.id == True %}
+                                                    <span id="button-container-{{ student.id }}">
+                                                        <button onclick="generateCertificate({{ student.id }})"
+                                                                class="btn btn-primary main-background-color">Yaratish
+                                                        </button>
+                                                    </span>
+                                                {% else %}
+                                                    {% with group.course.id|userCertificate:student.id as data %}
+                                                        <a target="_blank" href="{{ data.certificate.url }}"
+                                                           class="btn btn-success">Yuklab olish
+                                                        </a>
+                                                    {% endwith %}
+                                                {% endif %}
+                                            </td>
+
+                                        </tr>
+
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table><!-- end table -->
+                            </div><!-- end table responsive -->
+                        </div>
+                        <!-- end card body -->
+                    </div>
+                    <!-- end card -->
+                </div>
+                <!-- end col -->
+            </div>
+            <!-- end row -->
+
+
+        </div> <!-- container-fluid -->
+    </div>
+
+
+{% endblock content %}
+
+{% block footer %}
+    <script>
+        function generateCertificate(student) {
+            $.ajax({
+                method: "POST",
+                url: "{% url "certificate:generate" group=group.id %}",
+                data: {
+                    "student": student,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.success === true){
+                        $(`#button-container-${student}`).html(`<a target="_blank" href="${data.url}"
+                                                           class="btn btn-success">Yuklab olish
+                                                        </a>`)
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock footer %}

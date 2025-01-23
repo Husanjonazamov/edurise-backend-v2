@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:2318
+    volumes:
+      - .:/app
+    ports:
+      - "2318:2318"
+    env_file:
+      - .env
+  bot:
+    build: .
+    command: python bot.py
+    volumes:
+      - .:/app
+    env_file:
+      - .env
