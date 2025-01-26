@@ -13,6 +13,6 @@ def generate_random_username(user, length):
     """Generate a random username with the given length."""
     while True:
         username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
-        
+
         if not user.objects.filter(username=username).exists():
             return username
