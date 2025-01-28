@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-xuq1wx&ne%%hmx=!5+-0g64z$q13k&8#+m0*ev=*_tsjof!9u3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["edurise.ganiboyevdev.uz", "*"]
 
 # Application definition
 
@@ -40,16 +40,18 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_yasg',
     'django_filters',
     'drf_spectacular',
     'user',
     'organization',
     'certificate',
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
-
+CSRF_TRUSTED_ORIGINS = ['https://edurise.ganiboyevdev.uz']
 # REST framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -82,6 +84,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:2318',
     'http://localhost:3000',
+
 )
 
 ROOT_URLCONF = 'config.urls'

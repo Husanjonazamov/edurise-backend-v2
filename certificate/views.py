@@ -10,13 +10,13 @@ from django.shortcuts import get_object_or_404
 
 from organization.models import Organization
 from . import serializers, models
-from helpers.certificate import Certificate as CertificateGenerator
+from helpers.certificate import generate_certificate as CertificateGenerator
 
 
 class CertificateTemplatesListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = serializers.CertificateTemplatesSerializer
     pagination_class = None
-    
+
     def perform_create(self, serializer):
         organization_id = self.kwargs.get('organization_id')
 
@@ -25,20 +25,18 @@ class CertificateTemplatesListCreateAPIView(generics.ListCreateAPIView):
         templatest = models.CertificateTemplates.objects.filter(organization=organization)
         if templatest.count() >= 3:
             raise APIException({'error': 'You can have only 3 templates'})
-        
+
         serializer.save(
             organization=organization
         )
         return super().perform_create(serializer)
-    
+
     def get_queryset(self):
         organization_id = self.kwargs.get('organization_id')
         organization = get_object_or_404(Organization, id=organization_id)
         organization_templates = models.CertificateTemplates.objects.filter(organization=organization)
-        
+
         return organization_templates
-
-
 
 
 class CertificateRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -51,9 +49,6 @@ class CertificateRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIV
         return organization_certificates_templates
 
 
-
-
-
 class CertificateListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = serializers.CertificateSerializer
 
@@ -62,7 +57,7 @@ class CertificateListCreateAPIView(generics.ListCreateAPIView):
         organization = get_object_or_404(Organization, id=organization_id)
         organization_certificates = models.Certificate.objects.filter(organization=organization)
         return organization_certificates
-    
+
     def perform_create(self, serializer):
         organization_id = self.kwargs.get('organization_id')
         user_id = self.request.POST.get('user')
@@ -74,9 +69,9 @@ class CertificateListCreateAPIView(generics.ListCreateAPIView):
 
         first_name = user.first_name
         last_name = user.last_name
-        
+
         c = CertificateGenerator()
-        
+
         filepath, filename = c.generate(
             request=self.request,
             course=course,
@@ -84,16 +79,12 @@ class CertificateListCreateAPIView(generics.ListCreateAPIView):
             color=(0, 0, 0),
             complate="kursini muvaffaqiyatli yakunladi"
         )
-        
+
         serializer.save(
             organization=organization,
-            certificate = open(filepath, 'rb')
-        )   
+            certificate=open(filepath, 'rb')
+        )
         return super().perform_create(serializer)
-
-
-
-
 
 
 class FastCertificateGenerateView(APIView):
@@ -110,7 +101,7 @@ class FastCertificateGenerateView(APIView):
         c = CertificateGenerator(template.image)
 
         print(template.image)
-        print("😎 ~ views.py:95 -> template: ",  template)
+        print("😎 ~ views.py:95 -> template: ", template)
 
         filepath, filename = c.generate(
             request=request,
@@ -119,7 +110,7 @@ class FastCertificateGenerateView(APIView):
             color=(0, 0, 0),
             complate="Kursini muvaffaqiyatli yakunladi"
         )
-        
+
         certificate = models.FastCertificate()
         certificate.first_name = first_name
         certificate.last_name = last_name
@@ -140,11 +131,9 @@ class FastCertificateGenerateView(APIView):
         return Response(data, status=200)
 
 
-
-
 class FastCertificatesListAPIView(generics.ListAPIView):
     serializer_class = serializers.FastCertificateSerializer
-    
+
     def get_queryset(self):
         organization_id = self.kwargs.get('organization_id')
         organization = get_object_or_404(Organization, id=organization_id)
